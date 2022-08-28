@@ -1,0 +1,127 @@
+﻿<!DOCTYPE html>
+<html  lang="zh">
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+	<link rel="stylesheet" href="materialdesignicons.min.css">
+
+	<title>線稿自動上色</title>
+
+	<style>
+		.flex {
+			display: flex;
+			justify-content: center;
+		}
+		.body-color{
+			background-color: #d5d5d5;
+			height: 100%;
+		}
+		.canvas-div{
+			display: flex;
+		}
+		.div-div-canvas{
+			flex-direction: column;
+		}
+		.tools{
+			position: absolute;
+			flex-direction: column;
+			justify-content: start;
+			left: -81px;
+		}
+
+		@media only screen and (max-width: 925px){
+			.canvas-div{
+				flex-direction: column;
+			}
+			.div-div-canvas{
+				justify-content: center;
+			}
+		}
+		/* @media only screen and (min-width: 925px){
+		} */
+	</style>
+
+	<script src="./dist/index.bundle.js"></script>
+</head>
+<body>
+	<div id="app">
+		<v-app id="inspire">
+			<div class="body-color">
+				<v-app-bar color="#666666" dark>
+					<v-toolbar-title>{{title}}</v-toolbar-title>
+					<v-spacer></v-spacer>
+				</v-app-bar>
+				<div class="canvas-div">
+					<div class="flex div-div-canvas">
+						<div class="flex div-canvas">
+							<div style="position: relative;">
+								<div class="flex tools">
+									<v-radio-group v-model="tool">
+										<v-radio label="鉛筆" :value="TOOLS.PEN"></v-radio>
+										<v-radio label="橡皮擦" :value="TOOLS.ERASER"></v-radio>
+									</v-radio-group>
+									<v-radio-group v-model="lineSize">
+										<v-radio label="x1" :value="LINE_SIZE.X1"></v-radio>
+										<v-radio label="x4" :value="LINE_SIZE.X4"></v-radio>
+										<v-radio label="x8" :value="LINE_SIZE.X8"></v-radio>
+										<v-radio label="x12" :value="LINE_SIZE.X12"></v-radio>
+									</v-radio-group>
+								</div>
+								<vue-p5 id="p5-canvas" @sketch="sketch" @preload="preload" @setup="setup" @draw="draw"></vue-p5>
+							</div>
+							<img id="avatar" v-bind:src="avatar" v-on:load="avatarLoad" style="display: none;"/>
+						</div>
+						<v-bottom-sheet v-model="sheet" :hide-overlay="true">
+							<template v-slot:activator="{ on }">
+								<div class="flex">
+									<v-btn v-on="on">調整/選擇線搞</v-btn>
+									<v-btn v-on:click="p5_status = STATUS.DRAW_WRITE" :disabled="p5_status != STATUS.SET_IMAGE">固定</v-btn>
+									<v-btn v-on:click="ok" :disabled="!isModelLoaded">上色</v-btn>
+								</div>
+							</template>
+							<v-sheet height="180px">
+								<v-btn text icon style="position: absolute;right: 0px;" @click="sheet = !sheet">返回
+									<v-icon>mdi-close</v-icon>
+								</v-btn>
+								<div class="flex" v-show="!hide">
+									<v-btn v-on:click="clickArrow" :disabled="p5_status != STATUS.SET_IMAGE">←</v-btn>
+									<v-btn v-on:click="clickArrow" :disabled="p5_status != STATUS.SET_IMAGE">→</v-btn>
+									<v-btn v-on:click="clickArrow" :disabled="p5_status != STATUS.SET_IMAGE">↑</v-btn>
+									<v-btn v-on:click="clickArrow" :disabled="p5_status != STATUS.SET_IMAGE">↓</v-btn>
+								</div>
+								<div class="flex" v-show="!hide">
+									<v-btn v-on:click="clickZoom" :disabled="p5_status != STATUS.SET_IMAGE">+</v-btn>
+									<v-btn v-on:click="clickRotateArrow" :disabled="p5_status != STATUS.SET_IMAGE">↻</v-btn>
+									<v-btn v-on:click="clickRotateArrow" :disabled="p5_status != STATUS.SET_IMAGE">↺</v-btn>
+									<v-btn v-on:click="clickZoom" :disabled="p5_status != STATUS.SET_IMAGE">-</v-btn>
+								</div>
+								<div class="flex" v-show="!hide">
+										<v-slider
+											v-model="sliderVal"
+											label="縮放"
+											min="1"
+											v-bind:max="canvasWidth*2"
+											:disabled="p5_status != STATUS.SET_IMAGE"
+										></v-slider>
+								</div>
+								<div class="flex">
+									<v-btn @click="fileUpLoad">
+										<input type="file" id="uimg" value="圖" accept="image/*;capture=camera" style="display: none;" v-on:change="fileLoad"/>
+										選擇照片
+									</v-btn>
+								</div>
+							</v-sheet>
+						</v-bottom-sheet>
+					</div>
+					<div class="flex">
+						<vue-p5 id="p5-output-canvas" @sketch="outputSketch" @setup="outputSetup"></vue-p5>
+					</div>
+				</div>
+				<form id="form" action="/vglasses/GlassTryWearPhoto/GlassTryWearPhotoUpload.php" method="post">
+					<input type="hidden" name="photo"/>
+				</form>
+			</div>
+		</v-app>
+	</div>
+</body>
+</html>

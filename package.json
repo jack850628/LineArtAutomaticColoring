@@ -1,0 +1,40 @@
+{
+  "name": "LineArtAutomaticColoring",
+  "version": "1.0.220828",
+  "description": "Anime line art automatic coloring",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "author": "jack850628",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "css-loader": "^5.0.1",
+    "deepmerge": "^4.2.2",
+    "sass": "^1.30.0",
+    "sass-loader": "^10.1.0",
+    "stream": "0.0.2",
+    "style-loader": "^2.0.0",
+    "vue-loader": "^15.9.6",
+    "vue-template-compiler": "^2.6.12",
+    "webpack": "^5.61.0",
+    "webpack-cli": "^4.2.0"
+  },
+  "dependencies": {
+    "@babel/core": "^7.12.10",
+    "@tensorflow/tfjs": "^3.20.0",
+    "babel": "^6.23.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.2.2",
+    "file-saver": "^2.0.5",
+    "vue": "^2.6.12",
+    "vue-p5": "^0.8.4",
+    "vuetify": "^2.6.9",
+    "vuex": "^3.6.0"
+  }
+}
