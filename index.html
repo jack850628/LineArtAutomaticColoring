@@ -8,6 +8,9 @@
 	<title>線稿自動上色</title>
 
 	<style>
+		body{
+			user-select: none;
+		}
 		.flex {
 			display: flex;
 			justify-content: center;
@@ -66,6 +69,7 @@
 										<v-radio label="x8" :value="LINE_SIZE.X8"></v-radio>
 										<v-radio label="x12" :value="LINE_SIZE.X12"></v-radio>
 									</v-radio-group>
+									<v-btn v-on:click="clear">清空</v-btn>
 								</div>
 								<vue-p5 id="p5-canvas" @sketch="sketch" @preload="preload" @setup="setup" @draw="draw"></vue-p5>
 							</div>

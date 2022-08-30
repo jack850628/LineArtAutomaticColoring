@@ -189,6 +189,9 @@ window.onload = function(){
                     this.P5_mouseX = this.p5_mouseY = -1;
                 }
             },
+            clear(){
+                this.p5_sketch.background(this.p5_sketch.color(255, 255, 255));
+            },
             ok(){
                 var canvas = document.createElement('canvas');
                 canvas.width = canvas.height = 256;
