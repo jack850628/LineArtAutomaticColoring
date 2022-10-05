@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import vuetify from '@/plugins/vuetify';
 import VueP5 from 'vue-p5';
-import {generator, waitModelLoad} from './u2model';
+// import {generator, waitModelLoad} from './u2model';
 
 Vue.component('vue-p5', VueP5);
 
@@ -20,6 +20,13 @@ const LINE_SIZE = {
     X8: 8,
     X12: 12
 }
+
+function uuidv4() {
+    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+}
+const UUID = uuidv4()
 
 function newSizeH(w , h, nw){
     return (nw * h) / w;
@@ -83,7 +90,8 @@ window.onload = function(){
             avatarY: 0,
             sliderVal: 450,
             hide: true,
-            isModelLoaded: false,
+            // isModelLoaded: true,
+            isColoring: false,
 
             p5_sketch: null,
             p5_output_sketch: null,
@@ -91,6 +99,8 @@ window.onload = function(){
             P5_mouseX: -1,
             p5_mouseY: -1,
             p5_status: STATUS.INIT,
+
+            output_p5_image: null,
 
             tool: TOOLS.PEN,
             lineSize: LINE_SIZE.X1,
@@ -197,15 +207,38 @@ window.onload = function(){
                 canvas.width = canvas.height = 256;
                 canvas.getContext("2d").drawImage(document.querySelector('#p5-canvas > canvas'), 0, 0, 256, 256);  
 
-                setTimeout((function(){
-                    generator(canvas, document.querySelector('#p5-output-canvas > canvas'));
-                }).bind(this));
-                // var ctx = canv.getContext('2d');
-                // ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-                // ctx.drawImage(avatar, this.avatarX, this.avatarY, this.avatarWidth, this.avatarHeight);
-                // // console.log(canv.toDataURL());
-                // form.photo.value = canv.toDataURL();
-                // form.submit();
+                // setTimeout((function(){
+                //     generator(canvas, document.querySelector('#p5-output-canvas > canvas'));
+                // }).bind(this));
+
+                const eventSource = new EventSource('https://laacs.jack.origthatone.com/api/coloring/wait_image?userID=' + UUID);
+                eventSource.addEventListener('image', event => {
+                    this.output_p5_image = this.p5_output_sketch.loadImage('data:image/jpeg;base64,' + event.data);
+                    this.isColoring = false;
+                    eventSource.close();
+                });
+                eventSource.onerror = (err) => {
+                    console.error(err);
+                };
+                
+                var formData = new FormData();
+                formData.append('image', canvas.toDataURL());
+                formData.append('userID', UUID);
+                this.isColoring = true;
+                fetch('https://laacs.jack.origthatone.com/api/coloring/doColoring', {
+                    method: 'POST',
+                    body: formData
+                }).then(result => result.json()).then(result => {
+                    console.debug(result)
+                    // this.audioUrl = result.message;
+                    // this.$nextTick(function () {
+                    //     audio.play();
+                    // });
+                    // this.isModelLoaded = false;
+                }).catch(error => {
+                    this.isColoring = false;
+                    eventSource.close();
+                });
             },
             sketch(sk){
                 this.p5_sketch = sk;
@@ -251,9 +284,15 @@ window.onload = function(){
                 sketch.createCanvas(this.canvasWidth, this.canvasHeight);
                 sketch.background(sketch.color(255, 255, 255));
             },
+            outputDraw(sketch){
+                if(this.output_p5_image){
+                    console.log('???', this.output_p5_image)
+                    sketch.image(this.output_p5_image, 0, 0, this.canvasWidth, this.canvasHeight);
+                }
+            }
         },
         mounted(){
-            waitModelLoad().then(result => this.isModelLoaded=result);
+            // waitModelLoad().then(result => this.isModelLoaded=result);
         }
     });
 };
