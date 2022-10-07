@@ -203,9 +203,15 @@ window.onload = function(){
                 this.p5_sketch.background(this.p5_sketch.color(255, 255, 255));
             },
             ok(){
-                var canvas = document.createElement('canvas');
-                canvas.width = canvas.height = 256;
-                canvas.getContext("2d").drawImage(document.querySelector('#p5-canvas > canvas'), 0, 0, 256, 256);  
+                // var canvas = document.createElement('canvas');
+                // canvas.width = canvas.height = 256;
+                // canvas.getContext("2d").drawImage(document.querySelector('#p5-canvas > canvas'), 0, 0, canvas.width, canvas.height);
+                // console.log(canvas.toDataURL('image/jpeg', 1))
+
+                // var p5Image = this.p5_output_sketch.createImage(this.canvasWidth, this.canvasHeight);
+                // p5Image.drawingContext.drawImage(document.querySelector('#p5-canvas > canvas'), 0, 0, this.canvasWidth, this.canvasHeight);
+                // p5Image.resize(256, 256)
+                // console.log(p5Image.canvas.toDataURL('image/jpeg', 1))
 
                 // setTimeout((function(){
                 //     generator(canvas, document.querySelector('#p5-output-canvas > canvas'));
@@ -222,7 +228,7 @@ window.onload = function(){
                 };
                 
                 var formData = new FormData();
-                formData.append('image', canvas.toDataURL());
+                formData.append('image', document.querySelector('#p5-canvas > canvas').toDataURL('image/jpeg', 1));
                 formData.append('userID', UUID);
                 this.isColoring = true;
                 fetch('https://laacs.jack.origthatone.com/api/coloring/doColoring', {
@@ -286,7 +292,6 @@ window.onload = function(){
             },
             outputDraw(sketch){
                 if(this.output_p5_image){
-                    console.log('???', this.output_p5_image)
                     sketch.image(this.output_p5_image, 0, 0, this.canvasWidth, this.canvasHeight);
                 }
             }
